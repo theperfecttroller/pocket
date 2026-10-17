@@ -252,11 +252,13 @@ ipcMain.handle('meta:set', async (_e, g, id) => {
 // ---------- sounds ----------
 // Each slot uses the file the user picked in Settings, or the placeholder in the sounds folder.
 const SOUND_SLOTS = ['music', 'move', 'select', 'back', 'switch', 'launch'];
+// the bundled default for a slot: sounds/<slot>.<ext>, whichever of these formats is there (credits in sounds/LICENSES.txt)
+const defaultSound = s => ['ogg', 'mp3', 'wav'].map(e => path.join(__dirname, 'sounds', s + '.' + e)).find(p => fs.existsSync(p));
 ipcMain.handle('sounds:get', () => {
   const custom = loadConfig().sounds || {}, out = {};
   for (const s of SOUND_SLOTS) {
     const c = custom[s] && fs.existsSync(custom[s]) ? custom[s] : null;
-    out[s] = { url: toUrl(c || path.join(__dirname, 'sounds', s + '.wav')), custom: c, missing: !!custom[s] && !c };
+    out[s] = { url: toUrl(c || defaultSound(s)), custom: c, missing: !!custom[s] && !c };
   }
   return out;
 });

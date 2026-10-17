@@ -277,7 +277,7 @@ body.kbd #osk .k:focus{outline:3px solid var(--sky);outline-offset:2px;transform
   <div class="srow"><b>Music volume</b><input type="range" id="mvol" min="0" max="100" aria-label="Music volume"><span class="path vl" id="mvoll"></span></div>
   <div class="srow"><b>Effects volume</b><input type="range" id="svol" min="0" max="100" aria-label="Effects volume"><span class="path vl" id="svoll"></span></div>
   <div id="slist" style="display:grid;gap:8px"></div>
-  <p class="path">Each sound uses a placeholder until you choose your own file. Music loops, and pauses while a game is running.</p>
+  <p class="path">Each sound uses Pocket's built-in default until you choose your own file. Music loops, and pauses while a game is running.</p>
   <h3>Emulators</h3><div id="elist" style="display:grid;gap:12px"></div>
   <button class="btn ghost sm" id="addemu" data-own style="align-self:flex-start">+ Add emulator</button>
 </div></div>
@@ -344,11 +344,11 @@ FOLD=real?lib.systems.map((x,i)=>({f:1,n:x.name,k:x.id,a:PAL[i%8][0],b:PAL[i%8][
 I=real?lib.games.map((g,i)=>{const fi=Math.max(0,FOLD.findIndex(f=>f.k===g.system)),sn=FOLD[fi].n,st=g.stats||{};return{fav:!!g.fav,meta:g.meta||null,launches:st.launches||0,played:st.played||0,last:st.last||0,n:g.name,k:g.system,a:PAL[fi%8][0],b:PAL[fi%8][1],g:GL[i%7],gen:sn,ds:sn+' · '+g.file,pl:fmtT(st.played),la:fmtD(st.last),sz:fmt(g.size),pp:sn,p:g.path,key:g.key,file:g.file,art:g.art||{},ach:(g.name.length*5)%38+4,rt:['Great','Perfect','Good'][i%3]}}):I0}
 await loadLib();
 
-// ---------- sound: placeholders in sounds/ until the user picks files in Settings ----------
+// ---------- sound: the bundled defaults in sounds/ until the user picks files in Settings ----------
 const SNDL={music:'Music (loops)',move:'Move',select:'Select',back:'Back',switch:'Switch / sort',launch:'Launch game'};
 const SND={},vol={m:.4,s:.7};let sndInfo={},music=null,inGame=false;
 if(window.api){const c=await window.api.getConfig();vol.m=(c.musicVolume??40)/100;vol.s=(c.sfxVolume??70)/100;hasRawg=!!c.rawgKey}
-async function loadSounds(){sndInfo=window.api?await window.api.getSounds():Object.fromEntries(Object.keys(SNDL).map(k=>[k,{url:'sounds/'+k+'.wav'}]));
+async function loadSounds(){sndInfo=window.api?await window.api.getSounds():Object.fromEntries(Object.keys(SNDL).map(k=>[k,{url:'sounds/'+k+(k==='music'?'.mp3':'.ogg')}]));
  for(const k in SNDL)if(k!=='music'){const u=sndInfo[k]&&sndInfo[k].url;SND[k]=u?Object.assign(new Audio(u),{preload:'auto'}):null}
  const u=(sndInfo.music&&sndInfo.music.url)||'';if(!music){music=new Audio();music.loop=true}
  if(music.dataset.u!==u){music.dataset.u=u;if(u)music.src=u;else{music.removeAttribute('src');music.load()}}
@@ -617,7 +617,7 @@ function renderS(){const fk=focusKey(document.activeElement);
  $('#elist').innerHTML=`<datalist id="exes">${exes.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`+(Object.entries(cfg.emulators).map(([id,e])=>`<div class="emu" data-id="${esc(id)}"><div class="erow"><input class="in" data-f="name" placeholder="Name" value="${esc(e.name)}"><button class="btn ghost sm" data-a="rm">Remove</button></div><div class="erow"><input class="in" data-f="exe" list="exes" placeholder="Path to the emulator .exe" value="${esc(e.exe)}"><button class="btn ghost sm" data-a="exe">Browse</button></div><div class="erow"><input class="in" data-f="args" placeholder="Arguments, with {rom} where the game goes" value="${esc(showArgs(e.args))}"></div><div class="chips">${sys.map(s=>`<label class="sys" tabindex="0" data-s="${esc(s.id)}"><input type="checkbox" data-s="${esc(s.id)}" ${cfg.systems[s.id]===id?'checked':''}>${esc(s.name)}</label>`).join('')}</div></div>`).join('')||'<p class="path">No emulators yet. Add one below.</p>');
  refocus(fk)}
 function volLabels(){$('#mvoll').textContent=$('#mvol').value+'%';$('#svoll').textContent=$('#svol').value+'%'}
-function renderSnd(){$('#slist').innerHTML=Object.entries(SNDL).map(([k,l])=>{const s=sndInfo[k]||{},n=s.custom?s.custom.split(/[\\/]/).pop():s.missing?'File not found, using placeholder':'Placeholder';
+function renderSnd(){$('#slist').innerHTML=Object.entries(SNDL).map(([k,l])=>{const s=sndInfo[k]||{},n=s.custom?s.custom.split(/[\\/]/).pop():s.missing?'File not found, using the default':'Default';
  return`<div class="srow" data-k="${k}"><b>${l}</b><span class="path" title="${esc(s.custom||'')}">${esc(n)}</span><span class="erow">${k==='music'?'':`<button class="btn ghost sm" data-a="play" aria-label="Play ${l} sound">Play</button>`}<button class="btn ghost sm" data-a="pick">Choose file</button>${s.custom||s.missing?'<button class="btn ghost sm" data-a="reset">Reset</button>':''}</span></div>`}).join('')}
 $('#mvol').addEventListener('input',e=>{vol.m=e.target.value/100;volLabels();musicSync()});
 $('#svol').addEventListener('input',e=>{vol.s=e.target.value/100;volLabels()});

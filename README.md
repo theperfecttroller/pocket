@@ -39,7 +39,7 @@ npm start
 8. you can manually set your own artwork for games by clicking the picture icon in the bottom right of the game banner
 9. if a game got the wrong description, open it and press Game info to pick the right game from RAWG
 10. added or removed roms? press Rescan in settings
-11. sounds and music use placeholders until you pick your own files in settings (Sound section)
+11. sounds and music use the built-in defaults until you pick your own files in settings (Sound section)
 
 pocket starts in fullscreen. press F11 to switch to a window and back, or use the Window row in settings (it also has a Quit button for controllers)
 ### controls
@@ -71,4 +71,6 @@ artwork, game info, favorites, play time: the same folder\
 ### credits
 the font used is the [JetBrains Mono Nerd Font](https://github.com/JetBrains/JetBrainsMono) Copyright 2020 The JetBrains Mono Project Authors | [SIL Open Font License 1.1](https://openfontlicense.org)\
 game descriptions, genres, release dates, developers, publishers, and screenshots all provided by the [RAWG](https://rawg.io) API\
+default music: "Ultralounge" Kevin MacLeod ([incompetech.com](https://incompetech.com)) | licensed under [Creative Commons: By Attribution 4.0](http://creativecommons.org/licenses/by/4.0/)\
+default sound effects: "Interface Sounds" by [Kenney](https://kenney.nl) | CC0\
 recommended artwork is provided by [SteamGridDB](https://www.steamgriddb.com)
