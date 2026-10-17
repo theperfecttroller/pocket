@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+ <g transform="translate(0,-17)" stroke-linejoin="round">
+  <g fill="#000" stroke="#000" stroke-width="22"><rect x="118" y="126" width="96" height="38" rx="19"/><rect x="298" y="126" width="96" height="38" rx="19"/>
+   <path d="M150 150H362C420 150 452 190 470 270C486 340 478 380 440 388C405 396 385 372 365 340C355 322 340 312 320 312H192C172 312 157 322 147 340C127 372 107 396 72 388C34 380 26 340 42 270C60 190 92 150 150 150Z"/></g>
+  <g fill="#fff"><rect x="118" y="126" width="96" height="38" rx="19"/><rect x="298" y="126" width="96" height="38" rx="19"/>
+   <path d="M150 150H362C420 150 452 190 470 270C486 340 478 380 440 388C405 396 385 372 365 340C355 322 340 312 320 312H192C172 312 157 322 147 340C127 372 107 396 72 388C34 380 26 340 42 270C60 190 92 150 150 150Z"/></g>
+  <g fill="#000">
+   <rect x="138" y="198" width="24" height="74" rx="7"/><rect x="113" y="223" width="74" height="24" rx="7"/>
+   <circle cx="365" cy="207" r="14"/><circle cx="365" cy="263" r="14"/><circle cx="337" cy="235" r="14"/><circle cx="393" cy="235" r="14"/>
+   <circle cx="226" cy="222" r="9"/><circle cx="286" cy="222" r="9"/>
+  </g></g></svg>

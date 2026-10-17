@@ -38,6 +38,13 @@ body.nocur,body.nocur *{cursor:none!important}
 .logo b{display:flex;flex-direction:column;font-size:clamp(30px,5.2vw,68px);line-height:.95;font-weight:800;letter-spacing:-.04em;color:#fff;-webkit-text-stroke:9px #141414;paint-order:stroke fill;text-shadow:0 6px 0 #141414}
 .logo .l2{color:var(--a)}
 .logo p{display:none}
+/* nothing to show (no search results, empty library): a plain card with a message instead of the scenery banner */
+.hempty{display:none;position:absolute;inset:0;z-index:1;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:0 8%;text-align:center}
+.hempty svg{width:clamp(70px,9vw,110px);fill:#fff;opacity:.28;margin-bottom:6px}
+.hempty b{font-size:clamp(20px,2.6vw,32px);font-weight:800;letter-spacing:-.02em;overflow-wrap:anywhere}
+.hempty span{font-size:15px;color:var(--soft)}
+.hero.empty .hempty{display:flex}
+.hero.empty .edge,.hero.empty .banner,.hero.empty .logo,.hero.empty .br{display:none}
 .cap{position:absolute;z-index:3;display:flex;align-items:center;gap:11px;padding:6px 14px 6px 8px;border-radius:999px;background:var(--pill);box-shadow:var(--sh);font-weight:800;font-size:14px}
 .tl{left:14px;top:14px}.tr{right:14px;top:14px}.br{right:14px;bottom:14px;padding:5px;gap:2px}.bl{position:absolute;z-index:3;left:14px;bottom:14px;display:flex;gap:8px}
 .kb{font-size:10px;font-weight:800;padding:3px 7px;border-radius:7px;background:var(--pan);color:var(--mute)}
@@ -134,7 +141,8 @@ button.dk{border:0}
 @keyframes bootfail{to{opacity:0;visibility:hidden}}
 .bmark{width:132px;aspect-ratio:1;border-radius:30px;display:grid;place-items:center;background:linear-gradient(145deg,#22d3f0,#008ca8);box-shadow:inset 0 4px 0 #ffffff55,inset 0 -8px 0 #0000001f,0 22px 40px -18px var(--sky);animation:bpop .7s both cubic-bezier(.3,1.5,.5,1)}
 @keyframes bpop{from{opacity:0;transform:scale(.6)}}
-.bmark svg{width:58%;fill:#fff;filter:drop-shadow(0 4px 0 #0003);animation:tw 1.6s infinite alternate ease-in-out}
+.bmark svg{width:68%;fill:#fff;filter:drop-shadow(0 4px 0 #0003);animation:cbob 1.6s infinite alternate ease-in-out}
+@keyframes cbob{to{transform:translateY(-5px) rotate(-3deg)}}
 #boot b{font-size:34px;font-weight:800;letter-spacing:-.04em;animation:rise .6s .25s both cubic-bezier(.2,.9,.3,1)}
 .bbar{width:180px;height:6px;border-radius:3px;background:var(--stage);overflow:hidden;animation:rise .6s .4s both cubic-bezier(.2,.9,.3,1)}
 .bbar i{display:block;height:100%;width:40%;border-radius:3px;background:var(--sky);animation:bslide 1.1s infinite ease-in-out}
@@ -190,7 +198,7 @@ body.windowed #tbar{display:flex}
 body.windowed .app{margin-top:34px;height:calc(100% - 34px)}
 .tname{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;letter-spacing:-.02em;color:var(--soft)}
 .tname i{width:18px;aspect-ratio:1;border-radius:6px;display:grid;place-items:center;background:linear-gradient(145deg,#22d3f0,#008ca8)}
-.tname svg{width:60%;fill:#fff}
+.tname svg{width:78%;fill:#fff}
 .tbtns{display:flex;gap:6px;-webkit-app-region:no-drag}
 .tbtns button{width:34px;height:22px;border-radius:999px;display:grid;place-items:center;background:var(--pill);color:var(--soft);transition:background .15s,color .15s}
 .tbtns button:hover{background:var(--card);color:var(--ink)}
@@ -223,9 +231,11 @@ body.kbd #osk .k:focus{outline:3px solid var(--sky);outline-offset:2px;transform
 .osk-hints{flex-wrap:wrap;gap:8px 18px;font-size:12px}
 </style></head>
 <body>
-<div id="tbar"><div class="tname"><i><svg viewBox="0 0 24 24"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12C7 10 11 6 12 0z"/></svg></i>Pocket</div>
+<!-- the Pocket mark (a controller), drawn once and reused by the title bar, boot screen and empty states -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><g id="ctrl" transform="translate(0,-17)"><rect x="118" y="126" width="96" height="38" rx="19"/><rect x="298" y="126" width="96" height="38" rx="19"/><path fill-rule="evenodd" d="M150 150H362C420 150 452 190 470 270C486 340 478 380 440 388C405 396 385 372 365 340C355 322 340 312 320 312H192C172 312 157 322 147 340C127 372 107 396 72 388C34 380 26 340 42 270C60 190 92 150 150 150ZM138 198H162V223H187V247H162V272H138V247H113V223H138ZM351 207a14 14 0 1 0 28 0a14 14 0 1 0-28 0ZM351 263a14 14 0 1 0 28 0a14 14 0 1 0-28 0ZM323 235a14 14 0 1 0 28 0a14 14 0 1 0-28 0ZM379 235a14 14 0 1 0 28 0a14 14 0 1 0-28 0ZM217 222a9 9 0 1 0 18 0a9 9 0 1 0-18 0ZM277 222a9 9 0 1 0 18 0a9 9 0 1 0-18 0Z"/></g></defs></svg>
+<div id="tbar"><div class="tname"><i><svg viewBox="0 0 512 512"><use href="#ctrl"/></svg></i>Pocket</div>
  <div class="tbtns"><button id="wmin" tabindex="-1" aria-label="Minimize"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button><button id="wmax" tabindex="-1" aria-label="Maximize"><svg viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1.5"/></svg></button><button id="wcls" class="tx" tabindex="-1" aria-label="Close"><svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7m0-7l-7 7"/></svg></button></div></div>
-<div id="boot" aria-hidden="true"><div class="bmark"><svg viewBox="0 0 24 24"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12C7 10 11 6 12 0z"/></svg></div><b>Pocket</b><div class="bbar"><i></i></div></div>
+<div id="boot" aria-hidden="true"><div class="bmark"><svg viewBox="0 0 512 512"><use href="#ctrl"/></svg></div><b>Pocket</b><div class="bbar"><i></i></div></div>
 <div class="bg" id="bg"></div>
 <div class="app" id="app">
   <section class="hero" id="hero"><div id="hs">
@@ -236,6 +246,7 @@ body.kbd #osk .k:focus{outline:3px solid var(--sky);outline-offset:2px;transform
       <svg class="sp" style="--s:24px;right:8%;top:30%;animation-delay:-.5s" viewBox="0 0 24 24"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12C7 10 11 6 12 0z"/></svg>
       <div class="gl" id="gl"></div></div>
     <div class="logo"><b id="logo"></b><p id="ldesc"></p></div>
+    <div class="hempty" id="hempty"><svg viewBox="0 0 512 512"><use href="#ctrl"/></svg><b></b><span></span></div>
   </div>
   <button class="cap tl" id="pl" data-own title="Play stats" aria-label="Play stats"><span class="kb">X</span><span class="av">M</span><span style="color:#f0802a"><i class="gi" data-g="timer"></i><span id="ptot">0m</span></span></button>
   <div class="cap tr" id="pr"><span class="ctrl" id="ctrl"><i class="gi keep" data-g="pad"></i></span><i class="gi" data-g="wifi"></i><i class="gi" data-g="batt"></i><span id="time"></span></div>
@@ -400,8 +411,11 @@ function cycleSys(d){const ks=['',...FOLD.filter(f=>I.some(x=>x.k===f.k)).map(f=
 function cycleSort(){sortI=(sortI+1)%SORTS.length;$('#sortl').textContent=SORTS[sortI][1];try{localStorage.setItem('pocket.sort',SORTS[sortI][0])}catch{}build(list[idx]);play('switch')}
 function clearFilters(){if(!fQ&&!fSys)return;fQ='';$('#q').value='';fSys=null;renderTabs();build(list[idx]);play('back')}
 function updTot(){$('#ptot').textContent=fmtT0(I.reduce((s,x)=>s+(x.played||0),0))}
-function hero(x){const bn=document.querySelector('.banner');
- if(!x){tint($('#hero'),{a:PAL[4][0],b:PAL[4][1]});$('#logo').innerHTML='<span>Pocket</span>';bn.classList.remove('art');bn.style.backgroundImage='';$('#gl').innerHTML=sv('pad');$('#sp').innerHTML='';return}
+function hero(x){const bn=document.querySelector('.banner');$('#hero').classList.toggle('empty',!x);
+ if(!x){const q=fQ.trim(),h=$('#hempty');
+  h.querySelector('b').textContent=q?`No games match “${q}”`:I.length?'Nothing here yet':'No games yet';
+  h.querySelector('span').textContent=q?'Try another name, or press B to clear the search.':I.length?'This list is empty.':real?'Choose your ROMs folder in Settings (Start, or M on a keyboard).':'Open Pocket in the desktop app to see your games.';
+  $('#logo').innerHTML='';bn.classList.remove('art');bn.style.backgroundImage='';$('#sp').innerHTML='';return}
  tint($('#hero'),x);
  const w=x.n.split(' '),h=Math.ceil(w.length/2),cnt=I.filter(y=>y.k===x.k).length;
  const A=x.art||{};$('#logo').innerHTML=A.logo?`<img class="lg" src="${A.logo}" alt="">`:`<span>${esc(w.slice(0,h).join(' '))}</span><span class="l2">${esc(w.slice(h).join(' '))}</span>`;bn.classList.toggle('art',!!A.banner);bn.style.backgroundImage=A.banner?`url("${A.banner}")`:'';
@@ -434,7 +448,9 @@ function closeD(){if(!isOpen||busy)return;det.classList.remove('open');det.setAt
 function favUI(){if(list[idx])$('#fav').textContent=list[idx].fav?'♥ Favorited':'♡ Favorite'}
 // A in the details screen presses the focused button (Launch by default)
 function detOk(){const e=document.activeElement;if(e&&det.contains(e)&&e.matches('button'))e.click();else launch()}
-async function launch(){if(busy||!list[idx])return;busy=true;const x=list[idx];play('launch');$('#lico').innerHTML=sv(x.g);$('#lname').textContent='Starting '+x.n;$('#launch').classList.add('on');
+async function launch(){if(busy||!list[idx])return;busy=true;const x=list[idx];play('launch');
+ // the starting screen shows the game's own icon art (the built-in glyph only when it has none), same as the details screen
+ const li=$('#lico'),ia=x.art&&x.art.icon;li.classList.toggle('has',!!ia);li.style.backgroundImage=ia?`url("${ia}")`:'';li.innerHTML=ia?'':sv(x.g);$('#lname').textContent='Starting '+x.n;$('#launch').classList.add('on');
  const t0=Date.now();let r={ok:false,error:'Prototype only: nothing was actually launched.'};
  if(real&&x.p){try{r=await window.api.launch({system:x.k,path:x.p,key:x.key})}catch(e){r={ok:false,error:String(e)}}}
  if(r.ok){inGame=true;musicSync()}

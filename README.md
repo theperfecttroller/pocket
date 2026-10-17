@@ -62,6 +62,7 @@ pocket starts in fullscreen. press F11 to switch to a window and back, or use th
 npm run dist
 ```
 this makes `dist\Pocket-<version>.zip` (the version comes from package.json), a zipped copy of the app. share that zip, nothing else from dist is needed\
+to just rebuild the unpacked app folder for testing (faster, no zip), run `npm run pack` and start `dist\win-unpacked\Pocket.exe`\
 (a single-file exe was tried, but it unpacks itself every launch and takes about 20 seconds to open, so the release is a zipped folder instead)
 ### where data is stored
 everything lives in %APPDATA%\pocket, and npm start and the release share it, so your settings (including chosen sounds and API keys) are the same in both\
