@@ -18,6 +18,11 @@ contextBridge.exposeInMainWorld('api', {
   pickAudio: () => ipcRenderer.invoke('dialog:audio'),
   toggleFullscreen: () => ipcRenderer.invoke('win:fullscreen'),
   quit: () => ipcRenderer.invoke('app:quit'),
+  winState: () => ipcRenderer.invoke('win:state'),
+  onWinState: (cb) => ipcRenderer.on('win:state', (_e, s) => cb(s)),
+  winMinimize: () => ipcRenderer.invoke('win:minimize'),
+  winMaximize: () => ipcRenderer.invoke('win:maximize'),
+  winClose: () => ipcRenderer.invoke('win:close'),
   setFav: (k, on) => ipcRenderer.invoke('fav:set', k, on),
   launch: (game) => ipcRenderer.invoke('game:launch', game),
 });

@@ -7,9 +7,18 @@ const { pathToFileURL } = require('url');
 
 // Artwork cache, favorites and play time live in %APPDATA%\pocket, both with `npm start` and in the installed app.
 app.setPath('userData', path.join(app.getPath('appData'), 'pocket'));
-// Settings (ROM folder, emulators, which system uses which, API keys) live in config.json.
-// With `npm start` it sits next to this file. The installed app is read-only, so it uses the data folder instead.
-const CONFIG_PATH = app.isPackaged ? path.join(app.getPath('userData'), 'config.json') : path.join(__dirname, 'config.json');
+// Settings (ROM folder, emulators, which system uses which, API keys, chosen sounds) live in config.json in that same folder,
+// for `npm start` and the built app alike, so both always show the same settings (they used to keep separate files,
+// which made the chosen music vanish whenever the other one was launched).
+const CONFIG_PATH = path.join(app.getPath('userData'), 'config.json');
+// One-time move for people who used `npm start` before: take the config.json next to this file if there is no shared one yet.
+try {
+  const old = path.join(__dirname, 'config.json');
+  if (!app.isPackaged && !fs.existsSync(CONFIG_PATH) && fs.existsSync(old)) {
+    fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
+    fs.copyFileSync(old, CONFIG_PATH);
+  }
+} catch {}
 function loadConfig() {
   const base = { romsDir: 'D:\\ROMs', emulatorsDir: '', steamGridDbKey: '', rawgKey: '', emulators: {}, systems: {},
     sounds: {}, musicVolume: 40, sfxVolume: 70 };
@@ -265,11 +274,19 @@ ipcMain.handle('dialog:image', async () => {
 // window controls, so fullscreen can be left and the app closed with a controller too (Settings)
 ipcMain.handle('win:fullscreen', () => { if (mainWin) mainWin.setFullScreen(!mainWin.isFullScreen()); return true; });
 ipcMain.handle('app:quit', () => { app.quit(); return true; });
+// the page's own title bar buttons (windowed mode)
+const winState = () => ({ fullscreen: !!mainWin && mainWin.isFullScreen(), maximized: !!mainWin && mainWin.isMaximized() });
+ipcMain.handle('win:state', () => winState());
+ipcMain.handle('win:minimize', () => { if (mainWin) mainWin.minimize(); return true; });
+ipcMain.handle('win:maximize', () => { if (mainWin) { if (mainWin.isMaximized()) mainWin.unmaximize(); else mainWin.maximize(); } return true; });
+ipcMain.handle('win:close', () => { app.quit(); return true; });
 
 ipcMain.handle('config:get', () => loadConfig());
 ipcMain.handle('config:set', (_e, cfg) => {
   fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(cfg, null, 2)); return true;
+  // write a temp file and rename it, so a crash mid-save can never leave a half-written config (which would load as empty defaults)
+  fs.writeFileSync(CONFIG_PATH + '.tmp', JSON.stringify(cfg, null, 2));
+  fs.renameSync(CONFIG_PATH + '.tmp', CONFIG_PATH); return true;
 });
 ipcMain.handle('dialog:folder', async (_e, title) => {
   const r = await dialog.showOpenDialog(mainWin, { title, properties: ['openDirectory'] });
@@ -328,19 +345,35 @@ function createWindow() {
     height: 800,
     backgroundColor: '#2d2d2d',
     autoHideMenuBar: true,
+    frame: false, // no Windows title bar: the page draws its own (#tbar) while windowed
+    // the built exe already has the icon embedded; this gives `npm start` the same icon instead of Electron's
+    ...(app.isPackaged ? {} : { icon: path.join(__dirname, 'build', 'icon.png') }),
     fullscreen: true,
     show: false, // shown once the first frame (the boot screen) is painted, so there is no blank flash
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true },
   });
   win.once('ready-to-show', () => win.show());
+  // tell the page when the title bar should show (windowed) and which maximize icon to draw
+  // (on Windows isFullScreen() still has the old value when these events fire, so the fullscreen events carry the answer themselves)
+  for (const ev of ['enter-full-screen', 'leave-full-screen', 'maximize', 'unmaximize']) {
+    win.on(ev, () => win.webContents.send('win:state', { ...winState(), ...(ev.endsWith('full-screen') && { fullscreen: ev === 'enter-full-screen' }) }));
+  }
   setTimeout(() => { if (!win.isDestroyed() && !win.isVisible()) win.show(); }, 4000); // safety net
   // F11 toggles fullscreen (calling preventDefault here also stops the hidden menu from handling the key)
   win.webContents.on('before-input-event', (e, input) => {
     if (input.type === 'keyDown' && input.key === 'F11') { e.preventDefault(); win.setFullScreen(!win.isFullScreen()); }
+    // the layout is fixed, so Ctrl +, Ctrl - and Ctrl 0 do nothing (zoom is also remembered between launches, so a stray one would stick)
+    else if (input.type === 'keyDown' && (input.control || input.meta) && ['+', '-', '=', '_', '0'].includes(input.key)) e.preventDefault();
   });
+  // no zoom by Ctrl+scroll or pinch either, and start every launch at 100% even if an earlier zoom was remembered
+  const wc = win.webContents;
+  wc.setVisualZoomLevelLimits(1, 1);
+  wc.on('zoom-changed', () => wc.setZoomLevel(0));
+  wc.on('dom-ready', () => wc.setZoomLevel(0));
   win.loadFile('index.html');
   win.webContents.once('did-finish-load', () => setTimeout(() => scrapeAll(false, false), 1500));
 }
 
+app.setAppUserModelId('com.pocket.launcher'); // same id as the build's appId, so the taskbar groups and icons it as Pocket
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => app.quit());

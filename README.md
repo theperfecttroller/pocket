@@ -52,7 +52,8 @@ pocket starts in fullscreen. press F11 to switch to a window and back, or use th
 | Play Stats | P | X |
 | Previous / Next System | Q / E | LB / RB |
 | Change Sort | O | Select (View) |
-| Search | / or Ctrl+F | (keyboard only) |
+| Search | / or Ctrl+F | D-Pad Up from the top row, then A (opens the on-screen keyboard) |
+| Type in any text box | Keyboard | A on the box opens the on-screen keyboard (A type, X delete, Y space, LB/RB cursor, Select shift, Start done, B close) |
 | Settings | M | Start |
 | Fullscreen | F11 | (Settings) |
 | Quit | Alt+F4 | (Settings) |
@@ -63,8 +64,10 @@ npm run dist
 this makes `dist\Pocket-<version>.zip` (the version comes from package.json), a zipped copy of the app. share that zip, nothing else from dist is needed\
 (a single-file exe was tried, but it unpacks itself every launch and takes about 20 seconds to open, so the release is a zipped folder instead)
 ### where data is stored
-config.json: next to the project when you use npm start, in %APPDATA%\pocket when you use the release\
-artwork, game info, favorites, play time: %APPDATA%\pocket (shared by both)
+everything lives in %APPDATA%\pocket, and npm start and the release share it, so your settings (including chosen sounds and API keys) are the same in both\
+config.json: your settings and API keys\
+artwork, game info, favorites, play time: the same folder\
+(if you used an older npm start version, the config.json next to the project is copied there once, then ignored)
 ### credits
 the font used is the [JetBrains Mono Nerd Font](https://github.com/JetBrains/JetBrainsMono) Copyright 2020 The JetBrains Mono Project Authors | [SIL Open Font License 1.1](https://openfontlicense.org)\
 game descriptions, genres, release dates, developers, publishers, and screenshots all provided by the [RAWG](https://rawg.io) API\
