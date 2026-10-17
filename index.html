@@ -279,7 +279,7 @@ body.kbd #osk .k:focus{outline:3px solid var(--sky);outline-offset:2px;transform
   <div class="shead"><h2>Settings</h2><button class="btn ghost sm" id="sclose" data-own>Close</button></div>
   <div class="srow"><b>ROMs folder</b><span class="path" id="sroms"></span><button class="btn ghost sm" id="pickroms" data-own>Browse</button></div>
   <div class="srow"><b>Library</b><span class="path" id="slib"></span><button class="btn ghost sm" id="rescan" data-own>Rescan</button></div>
-  <div class="srow"><b>Window</b><span class="path">F11 also toggles fullscreen</span><span class="erow"><button class="btn ghost sm" id="sfull" data-own>Fullscreen</button><button class="btn ghost sm" id="squit" data-own>Quit Pocket</button></span></div>
+  <div class="srow"><b>Window</b><span class="path">F11 toggles fullscreen. To quit, press Esc (B on a controller) on the home screen.</span><button class="btn ghost sm" id="sfull" data-own>Fullscreen</button></div>
   <div class="srow"><b>Emulators folder</b><span class="path" id="semus"></span><button class="btn ghost sm" id="pickemus" data-own>Browse</button></div>
   <div class="srow" style="grid-template-columns:140px 1fr"><b>SteamGridDB key</b><input class="in" id="skey" type="password" placeholder="Paste your API key (free from steamgriddb.com)"></div>
   <div class="srow" style="grid-template-columns:140px 1fr"><b>RAWG key</b><input class="in" id="rkey" type="password" placeholder="Optional: descriptions, genres, release info (rawg.io/apidocs)"></div>
@@ -308,6 +308,10 @@ body.kbd #osk .k:focus{outline:3px solid var(--sky);outline-offset:2px;transform
   <div class="stats st4" id="stt"></div>
   <h3>Most played</h3><div class="bars" id="stg"></div>
   <div id="stsw" style="display:grid;gap:8px"><h3>By system</h3><div class="bars" id="sts"></div></div>
+</div></div>
+<div id="exitov" class="ov" aria-hidden="true"><div class="sbox" style="width:min(460px,92vw);text-align:center;align-items:center">
+  <h2>Quit Pocket?</h2><p class="path">A game that is running keeps running (its play time stops being tracked).</p>
+  <div class="erow" style="justify-content:center;gap:14px"><button class="btn ghost" id="excancel" data-own>Cancel</button><button class="btn" id="exquit" data-own>Quit</button></div>
 </div></div>
 <div id="launch"><div class="big" id="lico"></div><h2 id="lname"></h2><div class="trk"><i></i></div></div>
 <div id="toast"></div>
@@ -461,20 +465,23 @@ function move(dx,dy){if(!tiles[idx])return;const c=tiles[idx].getBoundingClientR
  if(best>=0){sel(best,false,true);play('move')}
  else if(dy<0){focusSearch();play('move')}} // nothing above the top row: Up reaches the search box
 const DIRS={l:[-1,0],r:[1,0],u:[0,-1],d:[0,1]};
-function act(a){if(busy)return;
+function act(a,soft){if(busy)return;
  if(osk.on)return oskAct(a);
  if(ov)return ovAct(a);
  if(isOpen){if(a==='back')closeD();else if(a==='ok')detOk();else if(DIRS[a])navMove(det,a);else if(a==='art')openArt();return}
  // search box focused (Up from the top row): A types with the on-screen keyboard, Down goes back to the games, B clears or leaves
  if(document.activeElement===qi){if(a==='ok')return oskOpen(qi);if(a==='d')return toGrid();if(a==='back')return qi.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}))}
  if(a==='menu')return openS();if(a==='art')return openArt();if(a==='stats')return openStats();if(a==='sort')return cycleSort();
- if(a==='prev')return cycleSys(-1);if(a==='next')return cycleSys(1);if(a==='back')return clearFilters();
+ if(a==='prev')return cycleSys(-1);if(a==='next')return cycleSys(1);
+ // Back steps out of a folder, then clears the search/system filter, and with nothing left to leave it opens the quit menu
+ // (soft = Backspace, which never opens the menu)
+ if(a==='back')return folder?up():(fQ||fSys||soft)?clearFilters():openExit();
  if(DIRS[a])return move(...DIRS[a]);if(a==='ok')go()}
 const KM={ArrowLeft:'l',a:'l',ArrowRight:'r',d:'r',ArrowUp:'u',w:'u',ArrowDown:'d',s:'d',Enter:'ok',' ':'ok',Escape:'back',Backspace:'back',m:'menu',x:'art',p:'stats',o:'sort',q:'prev','[':'prev',e:'next',']':'next'};
 document.addEventListener('keydown',e=>{if(osk.on)return oskKey(e);if(ov)return ovKey(e);
  if(!isOpen&&(e.key==='/'||(e.ctrlKey&&e.key.toLowerCase()==='f'))){e.preventDefault();focusSearch();return}
  const a=KM[e.key];if(!a||e.metaKey||e.ctrlKey||e.altKey)return;
- if(e.target.closest('[data-own]')&&(e.key==='Enter'||e.key===' '))return;e.preventDefault();act(a)});
+ if(e.target.closest('[data-own]')&&(e.key==='Enter'||e.key===' '))return;e.preventDefault();act(a,e.key==='Backspace')});
 // The mouse pointer hides while keys or a controller are in use and comes back when the mouse really moves.
 // Chromium also fires fake mouse events when content scrolls under a parked pointer, so only a changed position counts.
 let mx=-1,my=-1;
@@ -518,7 +525,10 @@ function poll(){const g=[...(navigator.getGamepads?navigator.getGamepads():[])].
 
 // ---------- overlays (Settings, artwork, game info, stats) ----------
 // Every overlay works with mouse, keyboard (Tab/arrows/Enter/Esc) and controller (d-pad/A/B).
-const OVS={settings:'#settings',art:'#artpick',meta:'#metapick',stats:'#statsov'};
+const OVS={settings:'#settings',art:'#artpick',meta:'#metapick',stats:'#statsov',exit:'#exitov'};
+// quit menu: Esc (B on a controller) on the home screen. It starts on Cancel so a stray press never quits by accident.
+const openExit=()=>showOv('exit','#excancel');
+$('#exquit').onclick=()=>window.api&&window.api.quit();$('#excancel').onclick=()=>closeOv();
 const NAVQ='button,input:not([type=checkbox]),label.sys';
 const navEls=root=>[...root.querySelectorAll(NAVQ)].filter(e=>!e.disabled&&e.getClientRects().length);
 function showOv(name,focus){if(ov&&ov!==name)closeOv(true);if(!ov)ovRet=document.activeElement;ov=name;const el=$(OVS[name]);
@@ -652,7 +662,7 @@ async function rescan(){if(!window.api){toast('Rescanning needs the desktop app.
  toast(lib.error?'Could not read the ROMs folder. Check it in Settings.':`Library rescanned: ${I.length} games${added?`, ${added} new`:''}${gone?`, ${gone} removed`:''}.`);
  if(added)window.api.scrapeStart(false,false)}
 $('#rescan').onclick=rescan;
-$('#sfull').onclick=()=>window.api.toggleFullscreen();$('#squit').onclick=()=>window.api.quit();
+$('#sfull').onclick=()=>window.api.toggleFullscreen();
 // title bar (windowed only): main tells us when fullscreen changes and whether the window is maximized
 if(window.api&&window.api.winState){
  const RES='<svg viewBox="0 0 12 12"><rect x="2" y="3.6" width="6.4" height="6.4" rx="1.4"/><path d="M4 3.6V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-.6"/></svg>',MAX='<svg viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1.5"/></svg>';

@@ -41,13 +41,16 @@ npm start
 10. added or removed roms? press Rescan in settings
 11. sounds and music use the built-in defaults until you pick your own files in settings (Sound section)
 
-pocket starts in fullscreen. press F11 to switch to a window and back, or use the Window row in settings (it also has a Quit button for controllers)
+pocket starts in fullscreen. press F11 to switch to a window and back, or use the Window row in settings\
+to quit, press Esc (B on a controller) on the home screen and choose Quit\
+only one pocket can run at a time, opening it again just brings the open one to the front
 ### controls
 | Action | Keyboard | Controller (XBOX Layout) |
 | :--- | :---: | :---: |
 | Move | Arrow Keys / WASD | D-Pad / Left Stick |
 | Open Game / Press button | Enter | A |
 | Back / Close / Clear search | Escape / Backspace | B |
+| Quit menu | Escape on the home screen (nothing to clear) | B on the home screen (nothing to clear) |
 | Change Artwork | X | Y |
 | Play Stats | P | X |
 | Previous / Next System | Q / E | LB / RB |
@@ -56,7 +59,7 @@ pocket starts in fullscreen. press F11 to switch to a window and back, or use th
 | Type in any text box | Keyboard | A on the box opens the on-screen keyboard (A type, X delete, Y space, LB/RB cursor, Select shift, Start done, B close) |
 | Settings | M | Start |
 | Fullscreen | F11 | (Settings) |
-| Quit | Alt+F4 | (Settings) |
+| Quit | Alt+F4, or the quit menu | the quit menu |
 ### building the release
 ```
 npm run dist

@@ -377,5 +377,18 @@ function createWindow() {
 }
 
 app.setAppUserModelId('com.pocket.launcher'); // same id as the build's appId, so the taskbar groups and icons it as Pocket
-app.whenReady().then(createWindow);
+// Only one Pocket at a time (two would fight over the same saved data and play two songs at once). The lock is tied to the data
+// folder, which `npm start` and the built app share, so starting one while the other is open just brings the open one forward.
+if (!app.requestSingleInstanceLock()) {
+  console.log('Pocket is already running, bringing it to the front.');
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (!mainWin) return;
+    if (mainWin.isMinimized()) mainWin.restore();
+    mainWin.show();
+    mainWin.focus();
+  });
+  app.whenReady().then(createWindow);
+}
 app.on('window-all-closed', () => app.quit());
