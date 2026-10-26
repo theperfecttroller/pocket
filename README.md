@@ -8,7 +8,7 @@ your ROM folder should be structured like [ES-DE](https://github.com/retrogameco
 made with ai\
 subject to visual changes
 ### download
-grab the latest `Pocket-x.x.x.zip` from [releases](https://github.com/goodstuffcheap/pocket/releases), right click it and choose Extract All, then run `Pocket.exe` from the extracted folder. nothing gets installed\
+grab the latest `Pocket-x.x.x.zip` from [releases](https://github.com/goodstuffcheap/pocket/releases), right click it and choose Extract All, then run `Pocket.exe` from the extracted folder.\
 windows smartscreen will warn you the first time because the app is not code signed (More info, Run anyway)\
 got the release? skip ahead to [using](#using)
 ### setup (building only)
