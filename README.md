@@ -1,12 +1,16 @@
 # pocket
 
+<img width="1918" height="1078" alt="image" src="https://github.com/user-attachments/assets/5d998396-2fe9-4106-9ca3-8aa60629706e" />
+
 ### info
+this is not an emulator\
 3ds style frontend like cocoon/iisu but for pc\
 for personal use (me, i don't intend to make changes unless its to fit my own needs)\
-this is not an emulator\
 your ROM folder should be structured like [ES-DE](https://github.com/retrogamecorps/ES-DE-Directories)\
-made with ai\
-subject to visual changes
+
+*made with ai*\
+*subject to visual changes*
+
 ### download
 grab the latest `Pocket-x.x.x.zip` from [releases](https://github.com/goodstuffcheap/pocket/releases), right click it and choose Extract All, then run `Pocket.exe` from the extracted folder.\
 windows smartscreen will warn you the first time because the app is not code signed (More info, Run anyway)\
